@@ -10,6 +10,7 @@ import { CategoryShareChart } from "@/components/dashboard/CategoryShareChart";
 import { DetailPanel } from "@/components/dashboard/DetailPanel";
 import { FreshnessIndicator } from "@/components/dashboard/FreshnessIndicator";
 import { FreshnessWarning } from "@/components/dashboard/FreshnessWarning";
+import { FixtureModeHint } from "@/components/dashboard/FixtureModeHint";
 import { KpiCards } from "@/components/dashboard/KpiCards";
 import { NetworkTreemap } from "@/components/dashboard/NetworkTreemap";
 import { ProtocolBarChart } from "@/components/dashboard/ProtocolBarChart";
@@ -64,6 +65,8 @@ function DashboardContent() {
       </header>
 
       <FreshnessWarning />
+
+      <FixtureModeHint />
 
       <DashboardSearch />
 

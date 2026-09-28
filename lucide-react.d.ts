@@ -12,6 +12,7 @@ declare module "lucide-react" {
   export const Copy: FC<SVGProps<SVGSVGElement>>;
   export const Download: FC<SVGProps<SVGSVGElement>>;
   export const ExternalLink: FC<SVGProps<SVGSVGElement>>;
+  export const FlaskConical: FC<SVGProps<SVGSVGElement>>;
   export const HelpCircle: FC<SVGProps<SVGSVGElement>>;
   export const Layers: FC<SVGProps<SVGSVGElement>>;
   export const Loader2: FC<SVGProps<SVGSVGElement>>;
