@@ -1,0 +1,104 @@
+{
+  "description": "Fixture payment-flow rows for Flow view development without GCP access. Covers parallel edges, per-asset aggregation, funding/drain edges, plus rows the builder must drop (failed op, self-payment, non-payment type).",
+  "period": "7d",
+  "start": "2026-09-21T00:00:00.000Z",
+  "end": "2026-09-27T23:59:59.999Z",
+  "rows": [
+    {
+      "source": "GCKICE63R2HM7FCXFCZQDVBTNFSDZUJCEAHFBRQPAKMFMEHUMMY3BXQPX",
+      "destination": "GDSBCQO34JHNS6VVZBFXMTFQPCGK7UJQHTFQXTHFXHMFBFGHMTMFVMXAU",
+      "type_string": "payment",
+      "asset": { "type": "native", "code": "XLM" },
+      "amount": "1200000000",
+      "operationCount": 12,
+      "successful": true
+    },
+    {
+      "source": "GCKICE63R2HM7FCXFCZQDVBTNFSDZUJCEAHFBRQPAKMFMEHUMMY3BXQPX",
+      "destination": "GDSBCQO34JHNS6VVZBFXMTFQPCGK7UJQHTFQXTHFXHMFBFGHMTMFVMXAU",
+      "type_string": "payment",
+      "asset": { "type": "native", "code": "XLM" },
+      "amount": "800000000",
+      "operationCount": 8,
+      "successful": true
+    },
+    {
+      "source": "GCKICE63R2HM7FCXFCZQDVBTNFSDZUJCEAHFBRQPAKMFMEHUMMY3BXQPX",
+      "destination": "GDSBCQO34JHNS6VVZBFXMTFQPCGK7UJQHTFQXTHFXHMFBFGHMTMFVMXAU",
+      "type_string": "payment",
+      "asset": {
+        "type": "issued",
+        "code": "USDC",
+        "issuer": "GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN"
+      },
+      "amount": "4500000000",
+      "operationCount": 5,
+      "successful": true
+    },
+    {
+      "source": "GDSBCQO34JHNS6VVZBFXMTFQPCGK7UJQHTFQXTHFXHMFBFGHMTMFVMXAU",
+      "destination": "GBZXK7OVZNTVXD2FTQDSXWKZVOJQQQXVDHQ3MFRFXQVNKSIQEPQZHQVMX",
+      "type_string": "path_payment_strict_send",
+      "asset": { "type": "native", "code": "XLM" },
+      "amount": "300000000",
+      "operationCount": 3,
+      "successful": true
+    },
+    {
+      "source": "GDSBCQO34JHNS6VVZBFXMTFQPCGK7UJQHTFQXTHFXHMFBFGHMTMFVMXAU",
+      "destination": "GBZXK7OVZNTVXD2FTQDSXWKZVOJQQQXVDHQ3MFRFXQVNKSIQEPQZHQVMX",
+      "type_string": "path_payment_strict_receive",
+      "asset": {
+        "type": "issued",
+        "code": "USDC",
+        "issuer": "GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN"
+      },
+      "amount": "1250000000",
+      "operationCount": 2,
+      "successful": true
+    },
+    {
+      "source": "GCKICE63R2HM7FCXFCZQDVBTNFSDZUJCEAHFBRQPAKMFMEHUMMY3BXQPX",
+      "destination": "GCQXK7OVZNTVXD2FTQDSXWKZVOJQQQXVDHQ3MFRFXQVNKSIQEPQZHMFA",
+      "type_string": "create_account",
+      "amount": "10000000",
+      "operationCount": 1,
+      "successful": true
+    },
+    {
+      "source": "GBZXK7OVZNTVXD2FTQDSXWKZVOJQQQXVDHQ3MFRFXQVNKSIQEPQZHQVMX",
+      "destination": "GCKICE63R2HM7FCXFCZQDVBTNFSDZUJCEAHFBRQPAKMFMEHUMMY3BXQPX",
+      "type_string": "account_merge",
+      "amount": "750000000",
+      "operationCount": 1,
+      "successful": true
+    },
+    {
+      "source": "GCKICE63R2HM7FCXFCZQDVBTNFSDZUJCEAHFBRQPAKMFMEHUMMY3BXQPX",
+      "destination": "GCQXK7OVZNTVXD2FTQDSXWKZVOJQQQXVDHQ3MFRFXQVNKSIQEPQZHMFA",
+      "type_string": "payment",
+      "asset": { "type": "native", "code": "XLM" },
+      "amount": "9000000000",
+      "operationCount": 4,
+      "successful": false
+    },
+    {
+      "source": "GDSBCQO34JHNS6VVZBFXMTFQPCGK7UJQHTFQXTHFXHMFBFGHMTMFVMXAU",
+      "destination": "GDSBCQO34JHNS6VVZBFXMTFQPCGK7UJQHTFQXTHFXHMFBFGHMTMFVMXAU",
+      "type_string": "payment",
+      "asset": { "type": "native", "code": "XLM" },
+      "amount": "5000000000",
+      "operationCount": 6,
+      "successful": true
+    },
+    {
+      "source": "GCKICE63R2HM7FCXFCZQDVBTNFSDZUJCEAHFBRQPAKMFMEHUMMY3BXQPX",
+      "destination": "GBZXK7OVZNTVXD2FTQDSXWKZVOJQQQXVDHQ3MFRFXQVNKSIQEPQZHQVMX",
+      "type_string": "manage_sell_offer",
+      "asset": { "type": "native", "code": "XLM" },
+      "amount": "2200000000",
+      "operationCount": 7,
+      "successful": true
+    }
+  ]
+}
