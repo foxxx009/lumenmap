@@ -17,6 +17,7 @@ import {
   writeDashboardUrlSearch,
 } from "@/lib/dashboard-url-state";
 import { findTreemapPath, type SearchResult } from "@/lib/search";
+import { activityRequestErrorFromBody } from "@/lib/errors/activity-failures";
 import type {
   ActivityVisualizationResponse,
   ApiErrorResponse,
@@ -60,8 +61,15 @@ async function fetchActivity(
 ): Promise<ActivityVisualizationResponse> {
   const response = await fetch(`/api/v1/activity?period=${period}`);
   if (!response.ok) {
-    const body = (await response.json()) as ApiErrorResponse;
-    throw new Error(body.message ?? "Failed to load activity data");
+    let body: unknown = null;
+    try {
+      body = (await response.json()) as ApiErrorResponse;
+    } catch {
+      body = null;
+    }
+    // Preserve the failure code so widgets can pick the right error copy
+    // (see lib/errors/activity-failures).
+    throw activityRequestErrorFromBody(body, response.status);
   }
   return response.json() as Promise<ActivityVisualizationResponse>;
 }

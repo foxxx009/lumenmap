@@ -12,6 +12,8 @@ export interface LogEntry {
   rowCount?: number;
   cacheHit?: boolean;
   errorClass?: ErrorClass;
+  /** Public failure code sent to the client (see lib/errors/activity-failures). */
+  errorCode?: string;
   errorMessage?: string;
 }
 

@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDashboard } from "@/components/dashboard/DashboardProvider";
 import { formatNumber } from "@/lib/utils";
+import { activityErrorCopy } from "@/lib/errors/activity-failures";
 
 export function TimeSeriesChart() {
   const { data, isLoading, isError, error } = useDashboard();
@@ -98,6 +99,10 @@ export function TimeSeriesChart() {
     return points.filter((_, i) => i % interval === 0 || i === points.length - 1);
   }, [points]);
 
+  // Resolved from the failure code so the credentials hint only renders for the
+  // credentials-missing class (see lib/errors/activity-failures).
+  const failureCopy = activityErrorCopy(error);
+
   // Handle explicit states
   if (isLoading) {
     return (
@@ -123,14 +128,10 @@ export function TimeSeriesChart() {
           </CardTitle>
         </CardHeader>
         <CardContent className="py-6">
-          <p className="text-sm text-zinc-400">
-            {error instanceof Error
-              ? error.message
-              : "Unable to load time-series activity charts from Hubble BigQuery."}
-          </p>
-          <p className="mt-2 text-xs text-zinc-500">
-            Verify GOOGLE_APPLICATION_CREDENTIALS or BigQuery dataset access permissions.
-          </p>
+          <p className="text-sm text-zinc-400">{failureCopy.message}</p>
+          {failureCopy.hint ? (
+            <p className="mt-2 text-xs text-zinc-500">{failureCopy.hint}</p>
+          ) : null}
         </CardContent>
       </Card>
     );

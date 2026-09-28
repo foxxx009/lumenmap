@@ -13,6 +13,7 @@ import {
   startTimer,
 } from "@/lib/log";
 import { isValidPeriod, PERIOD_OPTIONS } from "@/lib/periods";
+import { toPublicActivityError } from "@/lib/errors/activity-failures";
 import {
   ActivityResponseValidationError,
   publicValidationErrorBody,
@@ -223,21 +224,20 @@ export async function handleActivityRequest(
     const message =
       error instanceof Error ? error.message : "Failed to fetch activity data";
     console.error("[activity] Failed to fetch activity data:", message, error);
+    const failure = toPublicActivityError(error);
     logError({
       event: "activity.request.error",
       correlationId,
       period: parsed.period,
       durationMs: endTimer(timer),
       errorClass: classifyError(error),
+      errorCode: failure.code,
       errorMessage: message,
     });
 
-    const body: ApiErrorResponse = {
-      code: "INTERNAL_ERROR",
-      message: "An unexpected error occurred. Please try again later.",
-    };
-
-    return NextResponse.json(body, { status: 500 });
+    return NextResponse.json(failure satisfies ApiErrorResponse, {
+      status: 500,
+    });
   }
 }
 
@@ -276,12 +276,10 @@ export async function handleRawActivityRequest(
       error,
     );
 
-    const body: ApiErrorResponse = {
-      code: "INTERNAL_ERROR",
-      message: "An unexpected error occurred. Please try again later.",
-    };
-
-    return NextResponse.json(body, { status: 500 });
+    return NextResponse.json(
+      toPublicActivityError(error) satisfies ApiErrorResponse,
+      { status: 500 },
+    );
   }
 }
 

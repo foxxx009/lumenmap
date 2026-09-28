@@ -325,9 +325,67 @@ describe("GET /api/activity and /api/v1/activity", () => {
 
       assert.equal(response.status, 500);
       assert.deepEqual(await response.json(), {
+        code: "UPSTREAM_QUERY_FAILED",
+        message:
+          "The upstream Hubble query failed. Retrying may help; credentials are configured.",
+      });
+    } finally {
+      console.error = originalConsoleError;
+    }
+  });
+
+  test("separates credentials-missing failures from upstream query failures", async () => {
+    const originalConsoleError = console.error;
+    console.error = () => {};
+
+    try {
+      const credentials = await handleActivityRequest(
+        new Request("http://localhost/api/v1/activity?period=30d"),
+        async () => {
+          throw new Error(
+            "BigQuery credentials are required. Set GOOGLE_APPLICATION_CREDENTIALS in .env.local",
+          );
+        },
+      );
+
+      assert.equal(credentials.status, 500);
+      assert.deepEqual(await credentials.json(), {
+        code: "CREDENTIALS_MISSING",
+        message:
+          "BigQuery credentials are not configured on the server, so live data cannot be queried.",
+      });
+
+      const unknown = await handleActivityRequest(
+        new Request("http://localhost/api/v1/activity?period=30d"),
+        async () => {
+          throw new Error("socket hang up");
+        },
+      );
+
+      assert.equal(unknown.status, 500);
+      assert.deepEqual(await unknown.json(), {
         code: "INTERNAL_ERROR",
         message: "An unexpected error occurred. Please try again later.",
       });
+    } finally {
+      console.error = originalConsoleError;
+    }
+  });
+
+  test("maps raw research failures to the same public codes", async () => {
+    const originalConsoleError = console.error;
+    console.error = () => {};
+
+    try {
+      const response = await handleRawActivityRequest(
+        new Request("http://localhost/api/v1/activity/raw?period=30d"),
+        async () => {
+          throw new Error("BigQuery credentials are not configured");
+        },
+      );
+
+      assert.equal(response.status, 500);
+      assert.equal((await response.json()).code, "CREDENTIALS_MISSING");
     } finally {
       console.error = originalConsoleError;
     }
