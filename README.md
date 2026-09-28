@@ -58,6 +58,7 @@ Operation count is available today. Transaction count, active-account count, pay
 - Soroban vs classic share trends
 - Sparklines on KPI cards
 - `GET /api/v1/timeseries`
+- `GET /api/v1/dapps`
 
 ### Phase 2: Wallets and dApps
 
@@ -422,11 +423,53 @@ curl "http://localhost:3000/api/v1/timeseries?period=7d"
 
 ---
 
-### Planned endpoints
+### `GET /api/v1/dapps`
 
-| Endpoint | Description |
-| --- | --- |
-| `GET /api/v1/dapps` | Top contracts by protocol |
+Protocol leaderboard for a period, derived from the same protocol summary the
+dashboard chart renders.
+
+| Param | Values | Default |
+| --- | --- | --- |
+| `period` | `1d`, `7d`, `30d`, `month` | `1d` |
+| `limit` | integer `1`-`100` | all ranked protocols |
+
+```bash
+curl "http://localhost:3000/api/v1/dapps?period=7d&limit=10"
+```
+
+```json
+{
+  "period": "7d",
+  "start": "2026-08-03T00:00:00.000Z",
+  "end": "2026-08-09T23:59:59.999Z",
+  "source": "hubble",
+  "sourceTimestamp": "2026-08-09T22:45:00.000Z",
+  "isPeriodComplete": true,
+  "metric": "operation_count",
+  "totalOps": 900,
+  "labeledOps": 900,
+  "coverage": 100,
+  "unknownCount": 0,
+  "entries": [
+    {
+      "rank": 1,
+      "protocol": "Soroswap",
+      "opCount": 600,
+      "share": 66.67,
+      "entityCount": 3
+    }
+  ],
+  "sort": "opCount:desc,protocol:asc"
+}
+```
+
+Sort order is stable and documented in every response via `sort`:
+operation count descending, then protocol name ascending for ties. `share` is a
+percentage of `totalOps`, `coverage` is the percentage of operations carrying a
+known protocol label, and `unknownCount` counts unlabeled entities. Invalid
+`period`/`limit` values return `400` with `INVALID_PERIOD` / `INVALID_LIMIT`;
+provider failures return a safe `INTERNAL_ERROR` body. Fixture mode is supported
+and marks the response `fixture: true`.
 
 ---
 
