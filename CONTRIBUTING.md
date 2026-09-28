@@ -13,6 +13,7 @@ Thank you for your interest in contributing. This guide covers everything you ne
 - [Project structure](#project-structure)
 - [Available commands](#available-commands)
 - [Making changes](#making-changes)
+  - [Hubble column contract](docs/hubble-column-contract.md)
 - [Entity registry](#entity-registry)
 - [Branch and PR workflow](#branch-and-pr-workflow)
 - [Pull request expectations](#pull-request-expectations)
@@ -181,11 +182,19 @@ npm run lint       # check before committing
 
 ### Query changes (requires GCP)
 
+SQL depends on upstream Hubble columns that nothing in the app validates. Read
+the [Hubble column contract](docs/hubble-column-contract.md) before editing a
+query: it lists every column each query reads, the known drift hazards, the
+`INFORMATION_SCHEMA` / dry-run commands to confirm a column still exists, and a
+checklist to paste into your PR.
+
 1. Edit queries in `lib/hubble/queries.ts` or `lib/hubble/activity.ts`.
-2. Test against live data:
+2. Confirm the columns you reference still exist (see the contract doc), then
+   test against live data:
 
    ```bash
    npm run test:hubble
+   npm run test:hubble:registry
    ```
 
 3. If you change the shape of the response, update `lib/hubble/fixture.ts` to match so fixture mode stays representative.
