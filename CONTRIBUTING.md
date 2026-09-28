@@ -265,6 +265,7 @@ Valid categories: `defi`, `exchange`, `wallet`, `anchor`, `issuer`, `other`.
 - **Description:** Explain what changed and why. Mention the issue it closes with `Closes #<number>`.
 - **Scope:** Keep PRs small and focused. A PR that does one thing is faster to review and easier to revert.
 - **Lint:** `npm run lint` must pass with no errors.
+- **Partial-failure behavior:** Queries that feed `/api/v1/activity` are fetched in one batch, so a single failing subquery can take the whole response down. If your PR touches a query or API route, fill in the *API partial-failure behavior* section of the PR template: mark each query **required** or **optional**, and make optional ones fail soft (`runQuery(...).catch(() => [])` in `lib/hubble/activity.ts`) instead of rejecting the batch.
 - **Query changes:** Run `npm run test:hubble` and include the output in the PR description. If you do not have GCP access, note that clearly and ask a maintainer to verify.
 - **Fixture data:** If you add or rename response fields, update `lib/hubble/fixture.ts` to reflect the new shape.
 - **Entity additions:** Small additions to `data/entities.json` can be bundled into a single PR. Large batch updates should be their own PR.
