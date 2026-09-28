@@ -3,6 +3,7 @@ import { BigQueryLimitExceededError } from "@/lib/hubble/errors";
 import { getTimeseriesData, getFixtureTimeseriesResponse, type TimeseriesGranularity } from "@/lib/hubble/timeseries-data";
 import { resolveDataSource } from "@/lib/data-source";
 import { isValidPeriod, PERIOD_OPTIONS } from "@/lib/periods";
+import { NO_STORE_HEADERS, activityCacheHeaders } from "@/lib/http/cache-headers";
 import type { ApiErrorResponse, Period } from "@/lib/types";
 import {
   createCorrelationId,
@@ -75,12 +76,16 @@ export async function handleTimeseriesRequest(
   );
 
   if (!parsedPeriod.ok) {
-    return NextResponse.json(parsedPeriod.body, { status: parsedPeriod.status });
+    return NextResponse.json(parsedPeriod.body, {
+      status: parsedPeriod.status,
+      headers: NO_STORE_HEADERS,
+    });
   }
 
   if (!parsedGranularity.ok) {
     return NextResponse.json(parsedGranularity.body, {
       status: parsedGranularity.status,
+      headers: NO_STORE_HEADERS,
     });
   }
 
@@ -105,7 +110,7 @@ export async function handleTimeseriesRequest(
     });
     return NextResponse.json(
       { code: "INVALID_DATA_SOURCE", message },
-      { status: 400 },
+      { status: 400, headers: NO_STORE_HEADERS },
     );
   }
 
@@ -118,7 +123,7 @@ export async function handleTimeseriesRequest(
       durationMs: endTimer(timer),
     });
     return NextResponse.json(data, {
-      headers: { "Cache-Control": "public, max-age=900, s-maxage=900" },
+      headers: activityCacheHeaders({ isPeriodComplete: data.isPeriodComplete }),
     });
   }
 
@@ -136,7 +141,7 @@ export async function handleTimeseriesRequest(
     });
 
     return NextResponse.json(data, {
-      headers: { "Cache-Control": "public, max-age=900, s-maxage=900" },
+      headers: activityCacheHeaders({ isPeriodComplete: data.isPeriodComplete }),
     });
   } catch (error) {
     if (error instanceof BigQueryLimitExceededError) {
@@ -153,7 +158,7 @@ export async function handleTimeseriesRequest(
           code: "LIMIT_EXCEEDED",
           message: error.message,
         } satisfies ApiErrorResponse,
-        { status: 400 },
+        { status: 400, headers: NO_STORE_HEADERS },
       );
     }
 
@@ -173,7 +178,7 @@ export async function handleTimeseriesRequest(
         code: "INTERNAL_ERROR",
         message: "An unexpected error occurred. Please try again later.",
       } satisfies ApiErrorResponse,
-      { status: 500 },
+      { status: 500, headers: NO_STORE_HEADERS },
     );
   }
 }

@@ -338,7 +338,20 @@ inclusive time bounds, partial periods, source lag, filters, and top-N limits
 without requiring consumers to parse prose. The example abbreviates repeated
 coverage constraints; the response includes every applicable constraint.
 
-Responses are cached for 15 minutes (`Cache-Control: public, max-age=900, s-maxage=900`).
+#### Caching
+
+Successful responses are shared with browsers and the CDN/edge, with a TTL that
+depends on whether the requested period is still accumulating:
+
+| Period state | `isPeriodComplete` | `Cache-Control` |
+| --- | --- | --- |
+| Still accumulating (e.g. `1d` today) | `false` | `public, max-age=60, s-maxage=60` |
+| Closed window (e.g. a past `30d`) | `true` | `public, max-age=900, s-maxage=900` |
+
+`CDN-Cache-Control` and `Vercel-CDN-Cache-Control` mirror `Cache-Control` so
+browsers and shared caches agree. The long TTL is capped by the in-process
+`CACHE_TTL_SECONDS` default (900s), so an edge copy is never older than a fresh
+in-process entry. Error and validation responses are always `no-store`.
 
 ### `GET /api/v1/activity/raw`
 
@@ -575,7 +588,7 @@ run, locally and in CI (see `.github/workflows/e2e.yml`).
 
 ## Data notes
 
-Metric definitions, current-period coverage, Hubble freshness limits, source fields, and top-N qualifications are documented in the [versioned metric methodology](docs/metric-methodology.md). In particular, Hubble refreshes in intraday batches, current periods are provisional, and API responses are cached for 15 minutes by default.
+Metric definitions, current-period coverage, Hubble freshness limits, source fields, and top-N qualifications are documented in the [versioned metric methodology](docs/metric-methodology.md). In particular, Hubble refreshes in intraday batches, current periods are provisional, and API responses are cached at the edge: 60s for periods that are still accumulating and 900s for closed periods (errors are never cached).
 
 ## Activity categories
 

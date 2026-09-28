@@ -13,6 +13,7 @@ import {
   startTimer,
 } from "@/lib/log";
 import { isValidPeriod, PERIOD_OPTIONS } from "@/lib/periods";
+import { NO_STORE_HEADERS, activityCacheHeaders } from "@/lib/http/cache-headers";
 import {
   ActivityResponseValidationError,
   publicValidationErrorBody,
@@ -123,7 +124,10 @@ export async function handleActivityRequest(
       "4xx",
       parsed.body,
     );
-    return NextResponse.json(parsed.body, { status: parsed.status });
+    return NextResponse.json(parsed.body, {
+      status: parsed.status,
+      headers: NO_STORE_HEADERS,
+    });
   }
 
   logInfo({
@@ -148,7 +152,7 @@ export async function handleActivityRequest(
     });
     return NextResponse.json(
       { code: "INVALID_DATA_SOURCE", message },
-      { status: 400 },
+      { status: 400, headers: NO_STORE_HEADERS },
     );
   }
 
@@ -167,7 +171,9 @@ export async function handleActivityRequest(
     });
     recordActivityResponseSize(parsed.period, "2xx", validated);
     return NextResponse.json(validated, {
-      headers: { "Cache-Control": "public, max-age=900, s-maxage=900" },
+      headers: activityCacheHeaders({
+        isPeriodComplete: validated.isPeriodComplete,
+      }),
     });
   }
 
@@ -182,7 +188,9 @@ export async function handleActivityRequest(
     });
     recordActivityResponseSize(parsed.period, "2xx", validated);
     return NextResponse.json(validated, {
-      headers: { "Cache-Control": "public, max-age=900, s-maxage=900" },
+      headers: activityCacheHeaders({
+        isPeriodComplete: validated.isPeriodComplete,
+      }),
     });
   } catch (error) {
     if (error instanceof BigQueryLimitExceededError) {
@@ -199,7 +207,7 @@ export async function handleActivityRequest(
           code: "LIMIT_EXCEEDED",
           message: error.message,
         } satisfies ApiErrorResponse,
-        { status: 400 },
+        { status: 400, headers: NO_STORE_HEADERS },
       );
     }
 
@@ -216,7 +224,10 @@ export async function handleActivityRequest(
       {
         const body = publicValidationErrorBody();
         recordActivityResponseSize(parsed.period, "5xx", body);
-        return NextResponse.json(body, { status: 500 });
+        return NextResponse.json(body, {
+          status: 500,
+          headers: NO_STORE_HEADERS,
+        });
       }
     }
 
@@ -237,7 +248,10 @@ export async function handleActivityRequest(
       message: "An unexpected error occurred. Please try again later.",
     };
 
-    return NextResponse.json(body, { status: 500 });
+    return NextResponse.json(body, {
+      status: 500,
+      headers: NO_STORE_HEADERS,
+    });
   }
 }
 
@@ -249,13 +263,16 @@ export async function handleRawActivityRequest(
   const parsed = parseActivityPeriod(searchParams.get("period"));
 
   if (!parsed.ok) {
-    return NextResponse.json(parsed.body, { status: parsed.status });
+    return NextResponse.json(parsed.body, {
+      status: parsed.status,
+      headers: NO_STORE_HEADERS,
+    });
   }
 
   try {
     const data = await fetchActivityData(parsed.period);
     return NextResponse.json(toRawResearchResponse(data), {
-      headers: { "Cache-Control": "public, max-age=900, s-maxage=900" },
+      headers: activityCacheHeaders({ isPeriodComplete: data.isPeriodComplete }),
     });
   } catch (error) {
     if (error instanceof BigQueryLimitExceededError) {
@@ -264,7 +281,7 @@ export async function handleRawActivityRequest(
           code: "LIMIT_EXCEEDED",
           message: error.message,
         } satisfies ApiErrorResponse,
-        { status: 400 },
+        { status: 400, headers: NO_STORE_HEADERS },
       );
     }
 
@@ -281,7 +298,10 @@ export async function handleRawActivityRequest(
       message: "An unexpected error occurred. Please try again later.",
     };
 
-    return NextResponse.json(body, { status: 500 });
+    return NextResponse.json(body, {
+      status: 500,
+      headers: NO_STORE_HEADERS,
+    });
   }
 }
 
